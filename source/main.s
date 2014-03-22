@@ -26,13 +26,9 @@ loop: /* Turn on LED */
     .unreq  pin_num
     .unreq  pin_val
 
-    index   .req r2
-    mov     index, #0x3F0000
-delay1:
-    sub     index, #1
-    cmp     index, #0
-    bne     delay1
-    .unreq  index
+    /* Delay */
+    mov     r0, #0x3F0000
+    bl      wait
 
     /* Turn off LED */
     pin_num .req r0
@@ -42,13 +38,9 @@ delay1:
     bl      set_gpio
     .unreq  pin_num
     .unreq  pin_val
-
-    index   .req r2
-    mov     index, #0x3F0000
-delay2:
-    sub     index, #1
-    cmp     index, #0
-    bne     delay2
-    .unreq  index
+    
+    /* Delay */
+    mov     r0, #0x3F0000
+    bl      wait
 
     b loop

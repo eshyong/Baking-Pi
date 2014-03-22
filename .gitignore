@@ -1,0 +1,3 @@
+/build/*.o
+/build/*.elf
+kernel*
