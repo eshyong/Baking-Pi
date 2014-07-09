@@ -1,31 +1,34 @@
-/* Loads r0 with the address of the system timer */
-.globl get_timer_addr
-get_timer_addr:
-    ldr r0, =0x20003000
-    mov pc, lr
-
-/* Waits for a period of time, then returns.
- * Takes in a time period to wait, and decrements
- * until time is reached.
- */
+.globl get_timer_address
+.globl get_time_stamp
 .globl wait
+
+
+get_timer_address:
+    ldr     r0, =0x20003000
+    mov     pc, lr
+
+get_time_stamp:
+    push    {lr}
+    bl      get_timer_address
+    ldrd    r0, r1, [r0, #4]
+    pop     {pc}
+
 wait:
-    push         {lr} /* Push link register onto stack */
-    mov          r3, r0 /* Move r0 so it doesn't get overridden */
-    wait_time    .req r3
-    bl           get_timer_addr
-    timer_addr   .req r0
-    initial_time .req r1
-    delta        .req r2
-    ldr          initial_time, [timer_addr]
+    push    {lr}
+    elapsed .req r1
+    delay   .req r2
+    start   .req r3
+    mov     delay, r0
+    bl      get_time_stamp
+    mov     start, r0
 
 loop:
-    ldr delta, [timer_addr]
-    sub delta, initial_time
-    cmp delta, wait_time
-    blo loop
+    bl      get_time_stamp
+    sub     elapsed, r0, start
+    cmp     elapsed, delay
+    bls     loop
 
-    .unreq timer_addr
-    .unreq initial_time
-    .unreq delta
-    pop {pc}
+    .unreq  elapsed
+    .unreq  delay
+    .unreq  start
+    pop     {pc}

@@ -1,12 +1,21 @@
 
 Discarded input sections
 
+ .bss           0x0000000000000000        0x0 build/framebuffer.o
+ .ARM.attributes
+                0x0000000000000000       0x14 build/framebuffer.o
  .bss           0x0000000000000000        0x0 build/gpio.o
  .ARM.attributes
                 0x0000000000000000       0x14 build/gpio.o
+ .bss           0x0000000000000000        0x0 build/mailbox.o
+ .ARM.attributes
+                0x0000000000000000       0x14 build/mailbox.o
  .bss           0x0000000000000000        0x0 build/main.o
  .ARM.attributes
                 0x0000000000000000       0x14 build/main.o
+ .bss           0x0000000000000000        0x0 build/timer.o
+ .ARM.attributes
+                0x0000000000000000       0x14 build/timer.o
 
 Memory Configuration
 
@@ -15,26 +24,43 @@ Name             Origin             Length             Attributes
 
 Linker script and memory map
 
+LOAD build/framebuffer.o
 LOAD build/gpio.o
+LOAD build/mailbox.o
 LOAD build/main.o
+LOAD build/timer.o
 
 .init           0x0000000000008000        0x4
  *(.init)
  .init          0x0000000000008000        0x4 build/main.o
                 0x0000000000008000                _start
 
-.text           0x0000000000008004       0xcc
+.text           0x0000000000008004      0x208
  *(.text)
- .text          0x0000000000008004       0x80 build/gpio.o
-                0x0000000000008004                get_gpio_addr
-                0x000000000000800c                set_gpio_fun
-                0x0000000000008044                set_gpio
- .text          0x0000000000008084       0x4c build/main.o
+ .text          0x0000000000008004       0x60 build/framebuffer.o
+                0x0000000000008004                initialize_frame_buffer
+ .text          0x0000000000008064       0x80 build/gpio.o
+                0x0000000000008064                get_gpio_address
+                0x000000000000806c                set_gpio_function
+                0x00000000000080a4                set_gpio
+ .text          0x00000000000080e4       0x78 build/mailbox.o
+                0x00000000000080e4                get_mailbox_base
+                0x00000000000080ec                mailbox_write
+                0x0000000000008120                mailbox_read
+ .text          0x000000000000815c       0x70 build/main.o
+ .text          0x00000000000081cc       0x40 build/timer.o
+                0x00000000000081cc                get_timer_address
+                0x00000000000081d4                get_time_stamp
+                0x00000000000081e4                wait
 
-.data           0x00000000000080d0        0x0
+.data           0x0000000000009000     0x1000
  *(.data)
- .data          0x00000000000080d0        0x0 build/gpio.o
- .data          0x00000000000080d0        0x0 build/main.o
+ .data          0x0000000000009000     0x1000 build/framebuffer.o
+                0x0000000000009000                frame_buffer_info
+ .data          0x000000000000a000        0x0 build/gpio.o
+ .data          0x000000000000a000        0x0 build/mailbox.o
+ .data          0x000000000000a000        0x0 build/main.o
+ .data          0x000000000000a000        0x0 build/timer.o
 
 /DISCARD/
  *(*)

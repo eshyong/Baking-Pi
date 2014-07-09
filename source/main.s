@@ -5,42 +5,52 @@ _start:
 
 .section .text
 main:
-    /* Moves stack pointer to 0x8000 */
-    mov sp, #0x8000
+    mov     sp, #0x8000
 
-    /* Enables output to LED */
-    pin_num .req r0
-    pin_fun .req r1
-    mov     pin_num, #16
-    mov     pin_fun, #1
-    bl      set_gpio_fun
-    .unreq  pin_num
-    .unreq  pin_fun
+    mov     r0, #1024
+    mov     r1, #768
+    mov     r2, #16
+    bl      initialize_frame_buffer
 
-loop: /* Turn on LED */
-    pin_num .req r0
-    pin_val .req r1
-    mov     pin_num, #16
-    mov     pin_val, #0
+    teq     r0, #0
+    bne     no_error
+
+    mov     r0, #16
+    mov     r1, #1
+    bl      set_gpio_function
+    mov     r0, #16
+    mov     r1, #0
     bl      set_gpio
-    .unreq  pin_num
-    .unreq  pin_val
 
-    /* Delay */
-    mov     r0, #0x3F0000
-    bl      wait
+error:
+    b error
 
-    /* Turn off LED */
-    pin_num .req r0
-    pin_val .req r1
-    mov     pin_num, #16
-    mov     pin_val, #1
-    bl      set_gpio
-    .unreq  pin_num
-    .unreq  pin_val
-    
-    /* Delay */
-    mov     r0, #0x3F0000
-    bl      wait
+no_error:
+    fb_info_addr    .req r4
+    mov             fb_info_addr, r0
 
-    b loop
+render:
+    fb_addr .req r3
+    ldr     fb_addr, [fb_info_addr, #32]
+    colour  .req r0
+    y       .req r1
+    mov     y, #768
+    draw_row:
+        x   .req r2
+        mov x, #1024
+        draw_pixel:
+            strh    colour, [fb_addr]
+            add     fb_addr, #2
+            sub     x, #1
+            teq     x, #0
+            bne     draw_pixel
+        
+        sub     y, #1
+        add     colour, #1
+        teq     y, #0
+        bne     draw_row
+
+    b render
+
+.unreq fb_addr
+.unreq fb_info_addr

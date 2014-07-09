@@ -1,3 +1,4 @@
 /build/*.o
 /build/*.elf
 kernel*
+/source/*.swp
